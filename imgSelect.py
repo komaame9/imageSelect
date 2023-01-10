@@ -2,6 +2,7 @@ import glob
 import cv2
 
 import os
+import sys
 import shutil
 import random
 
@@ -9,7 +10,7 @@ FORCE_WINDOW_HEIGHT=True
 FORCE_WINDOW_WIDTH=True
 RANDOM=True
 
-DIRECTORY = "/mnt/d/Data/Image/2D/"
+DIRECTORY = "."
 SIZE_H = 1500.0
 SIZE_W = 1500.0
 
@@ -35,9 +36,15 @@ def loadImage(filename):
     print("open file: "+file)
     return cv2.resize(img, dsize=(w,h))
 
+def checkDirectory(argv):
+    if (len(argv) == 2):
+        return argv[1]
+    return DIRECTORY
 
 
-directory = DIRECTORY
+#print(sys.argv)
+
+directory = checkDirectory(sys.argv)
 unstarDir = directory + 'unstar'
 
 os.makedirs(unstarDir, exist_ok=True);
