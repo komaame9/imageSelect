@@ -13,6 +13,8 @@ RANDOM=True
 DIRECTORY = "."
 SIZE_H = 1500.0
 SIZE_W = 1500.0
+WINDOW_W = 3840.0
+WINDOW_H = 2160.0
 
 def isImage(filename):
     if(filename.endswith('.png') or
@@ -41,6 +43,22 @@ def checkDirectory(argv):
         return argv[1]
     return DIRECTORY
 
+def setWindowCentering(windowName, img):
+    h, w, c = img.shape
+    x = int(WINDOW_W/2-w/2)
+    y = int(WINDOW_H/2-h/2)
+    cv2.moveWindow(windowName, x, y)
+
+def isDeleteKey(key):
+    if (key == 100):
+        return True
+    return False
+    
+def isBackKey(key):
+    # "right or A or B"
+    if (key == 83 or key == 97 or key == 98):
+        return True
+    return False
 
 #print(sys.argv)
 
@@ -58,8 +76,16 @@ if (RANDOM):
 windowName = 'image'
 
 print('files left:', len(files))
+
+index = 0
+while True:
+    if (index < 0):
+        index = 0
+    if (index > len(files)):
+        index = 0
     
-for file in files:
+    file = files[index]
+    print("select file:", file +" index:" + str(index));
     if (not isImage(file)):
         break
     
@@ -68,22 +94,31 @@ for file in files:
         print('can not read:',file)
         print('move to unstar directory :', file)
         shutil.move(file, unstarDir)
+        files.remove(file)
         continue
     
     cv2.imshow(windowName, img)
+    setWindowCentering(windowName, img)
     while(True):
         key = cv2.waitKey(1)
-        # ESC key pressed
-        if (key == 27) :
-            exit(0)
-        elif (key != -1):
+        if (key != -1):
+            print ("key pressed:", str(key))
+            # ESC key pressed
+            if (key == 27) :
+                exit(0)
             # if key pressed "D"
-            if (key == 100):
+            if (isDeleteKey(key)):
                 print('move to unstar directory :', file)
                 shutil.move(file, unstarDir)
-            break
+                files.remove(file)
+            # if key pressed "right or A"
+            elif (isBackKey(key)):
+                index = index - 1
+            # if any other key pressed
+            else:
+                index = index + 1
+            break;
         # window closed
         if(cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1):
             exit(0)
-        
 
